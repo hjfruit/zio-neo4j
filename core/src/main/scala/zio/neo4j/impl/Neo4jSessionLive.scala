@@ -15,19 +15,19 @@ import org.neo4j.driver.async.*
 final class Neo4jSessionLive(underlying: AsyncSession) extends Neo4jSession:
 
   def beginTransaction(config: TransactionConfig = TransactionConfig.empty()): Task[Neo4jTransaction] =
-    ZIO.fromCompletionStage(underlying.beginTransactionAsync(config)).map(new Neo4jTransactionLive(_))
+    ZIO.blocking(ZIO.fromCompletionStage(underlying.beginTransactionAsync(config)).map(new Neo4jTransactionLive(_)))
 
   def readTransaction[T](
     work: AsyncTransactionWork[CompletionStage[T]],
     config: TransactionConfig = TransactionConfig.empty()
   ): Task[T] =
-    ZIO.fromCompletionStage(underlying.readTransactionAsync(work, config))
+    ZIO.blocking(ZIO.fromCompletionStage(underlying.readTransactionAsync(work, config)))
 
   def writeTransaction[T](
     work: AsyncTransactionWork[CompletionStage[T]],
     config: TransactionConfig = TransactionConfig.empty()
   ): Task[T] =
-    ZIO.fromCompletionStage(underlying.writeTransactionAsync(work, config))
+    ZIO.blocking(ZIO.fromCompletionStage(underlying.writeTransactionAsync(work, config)))
 
   def run(
     query: String,
