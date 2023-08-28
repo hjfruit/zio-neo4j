@@ -22,8 +22,8 @@ extension (neo4jDriver: Neo4jDriver)
 
   def withLocalTx[A](
     query: Query,
-    sessionConfig: SessionConfig = SessionConfig.defaultConfig(),
-    config: TransactionConfig = TransactionConfig.empty()
+    sessionConfig: SessionConfig,
+    config: TransactionConfig
   )(action: Neo4jResultCursor => Task[A]): Task[A] =
     withLocalTx(query.text(), query.parameters().asMap().asScala.toMap, sessionConfig, config)(action)
 
