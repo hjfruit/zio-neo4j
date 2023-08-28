@@ -37,11 +37,24 @@ lazy val core = project
     testFrameworks     := Seq(new TestFramework("zio.test.sbt.ZTestFramework"))
   )
 
+lazy val examples = project
+  .in(file("examples"))
+  .settings(
+    publish / skip := true,
+    libraryDependencies ++= Seq(
+      "dev.zio"  %% "zio"              % zioVersion % Provided,
+      "dev.zio"  %% "zio-test"         % zioVersion % Test,
+      "org.neo4j" % "neo4j-cypher-dsl" % "2023.6.0"
+    )
+  )
+  .dependsOn(core)
+
 lazy val `zio-neo4j` = project
   .in(file("."))
   .settings(
     publish / skip := true
   )
   .aggregate(
-    core
+    core,
+    examples
   )

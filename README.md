@@ -32,20 +32,52 @@ libraryDependencies ++= Seq(
 ```
 
 ## Example1
+
+Manually commit transactions:
 ```scala
-final class Neo4jService(neo4jDriver: Neo4jDriver) {
-  def list = {
+import zio.Exit.*
+import zio.ZIO
+import zio.neo4j.Neo4jDriver
+
+import org.neo4j.driver.Record
+
+final class Neo4jServiceExample2(neo4jDriver: Neo4jDriver) {
+
+  def list: ZIO[Any, Throwable, List[Record]] =
     neo4jDriver.session.flatMap { neo4j =>
       neo4j.beginTransaction.flatMap { tx =>
-        (for
-          cursor <- neo4j.run(query, Map.empty, TransactionConfig.empty())
-          records <- cursor.list
-          _ <- ZIO.succeed(println(records))
-          _ <- tx.commit
-        yield {}
-        ).onError(_ => tx.rollback.onError(cause => ZIO.logErrorCause(cause)).ignoreLogged)
+        neo4j.run(query, Map.empty, TransactionConfig.empty()).flatMap(_.list).onExit {
+          case Failure(e) =>
+            ZIO.logErrorCause(e) *> tx.rollback.onError(cause => ZIO.logErrorCause(cause)).ignoreLogged
+          case Success(_) =>
+            tx.commit
+        }
       }
     }
-  }
+}
+
+```
+
+## Example2
+
+Automatically commit transactions:
+```scala
+import zio.Exit.*
+import zio.ZIO
+import zio.neo4j.Neo4jDriver
+
+import org.neo4j.driver.Record
+import org.neo4j.driver.async.ResultCursor
+
+final class Neo4jServiceExample2(neo4jDriver: Neo4jDriver) {
+
+  def list: ZIO[Any, Throwable, List[Record]] =
+    neo4jDriver.session.flatMap { neo4j =>
+      neo4j
+        .readTransaction[ResultCursor](tx => tx.runAsync(query, Map.empty.asJava))
+        .map(_.wrapped)
+        .flatMap(_.list)
+        .flatMap(records => ZIO.succeed(println(records)))
+    }
 }
 ```
