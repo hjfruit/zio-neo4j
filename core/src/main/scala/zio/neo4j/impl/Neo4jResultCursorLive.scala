@@ -2,7 +2,6 @@ package zio
 package neo4j
 package impl
 
-import java.util.concurrent.Executor
 import java.util.function.Consumer
 
 import scala.jdk.CollectionConverters.*
@@ -13,7 +12,7 @@ import org.neo4j.driver.*
 import org.neo4j.driver.async.ResultCursor
 import org.neo4j.driver.summary.ResultSummary
 
-final class Neo4jResultCursorLive(underlying: ResultCursor) extends Neo4jResultCursor:
+private[neo4j] final class Neo4jResultCursorLive(underlying: ResultCursor) extends Neo4jResultCursor:
   override def keys: Task[List[String]] = ZIO.attempt(underlying.keys().asScala.toList)
 
   override def consume: Task[ResultSummary] = ZIO.fromCompletionStage(underlying.consumeAsync())

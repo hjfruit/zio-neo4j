@@ -2,16 +2,11 @@ package zio
 package neo4j
 package impl
 
-import java.io.IOException
-import java.net.URI
-import java.util.concurrent.CompletionStage
-
-import zio.{ Scope, Task, URIO, ZIO, ZLayer }
+import zio.{ Task, ZIO }
 
 import org.neo4j.driver.*
-import org.neo4j.driver.async.AsyncSession
 
-final class Neo4jDriverLive(underlying: Driver) extends Neo4jDriver:
+private[neo4j] final class Neo4jDriverLive(underlying: Driver) extends Neo4jDriver:
 
   override def session(sessionConfig: SessionConfig): Task[Neo4jSession] =
     ZIO.attempt(underlying.asyncSession(sessionConfig)).map(new Neo4jSessionLive(_))

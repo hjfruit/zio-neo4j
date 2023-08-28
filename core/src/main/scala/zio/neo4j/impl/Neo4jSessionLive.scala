@@ -12,7 +12,7 @@ import zio.{ Task, ZIO }
 import org.neo4j.driver.*
 import org.neo4j.driver.async.*
 
-final class Neo4jSessionLive(underlying: AsyncSession) extends Neo4jSession:
+private[neo4j] final class Neo4jSessionLive(underlying: AsyncSession) extends Neo4jSession:
 
   def beginTransaction(config: TransactionConfig = TransactionConfig.empty()): Task[Neo4jTransaction] =
     ZIO.blocking(ZIO.fromCompletionStage(underlying.beginTransactionAsync(config)).map(new Neo4jTransactionLive(_)))

@@ -6,7 +6,7 @@ import zio.*
 
 import org.neo4j.driver.async.AsyncTransaction
 
-final class Neo4jTransactionLive(underlying: AsyncTransaction) extends Neo4jTransaction:
+private[neo4j] final class Neo4jTransactionLive(underlying: AsyncTransaction) extends Neo4jTransaction:
 
   override def close: Task[Unit] = ZIO.blocking(ZIO.fromCompletionStage(underlying.closeAsync()).unit)
 

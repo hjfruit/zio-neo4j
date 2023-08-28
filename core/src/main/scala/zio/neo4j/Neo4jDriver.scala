@@ -2,8 +2,9 @@ package zio.neo4j
 
 import java.io.IOException
 import java.net.URI
+import java.util.concurrent.TimeUnit
 
-import zio.{ Scope, Task, URIO, URLayer, ZIO, ZLayer }
+import zio.{ Scope, Task, ULayer, URIO, URLayer, ZIO, ZLayer }
 import zio.neo4j.impl.*
 
 import org.neo4j.driver.*
@@ -35,6 +36,17 @@ trait Neo4jDriver:
 end Neo4jDriver
 
 object Neo4jDriver:
+
+  lazy val defaultConfig: ULayer[Config] = ZLayer.succeed(
+    Config
+      .builder()
+      .withEncryption
+      .withConnectionTimeout(10, TimeUnit.SECONDS)
+      .withMaxConnectionLifetime(30, TimeUnit.MINUTES)
+      .withMaxConnectionPoolSize(10)
+      .withConnectionAcquisitionTimeout(20, TimeUnit.SECONDS)
+      .build()
+  )
 
   lazy val live: URLayer[Neo4jAuthConfig with Config, Neo4jDriver] = ZLayer.scoped {
     for

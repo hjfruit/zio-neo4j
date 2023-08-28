@@ -2,11 +2,10 @@ package zio.neo4j.example
 
 import scala.jdk.CollectionConverters.*
 
-import zio.Exit.*
 import zio.ZIO
 import zio.neo4j.*
 
-import org.neo4j.driver.{ Record, TransactionConfig }
+import org.neo4j.driver.Record
 import org.neo4j.driver.async.ResultCursor
 
 final class Neo4jServiceExample2(neo4jDriver: Neo4jDriver) {
