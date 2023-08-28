@@ -14,18 +14,18 @@ ZIO Pulsar
 ## Dependency
 
 Scala 3
-```
+```scala
 libraryDependencies += "io.github.jxnu-liguobin" %% "zio-neo4j" % <latest version>
 ```
 
 Scala 2.13.6+ (sbt 1.5.x)
-```
+```scala
 libraryDependencies += 
   ("io.github.jxnu-liguobin" %% "zio-neo4j" % NewVersion).cross(CrossVersion.for2_13Use3)
 ```
 
-These dependencies are required in the project classpath (ZIO projects only need to pay attention to whether they have imported zio-streams):
-```
+These dependencies are required in the project classpath:
+```scala
 libraryDependencies ++= Seq(
   "dev.zio" %% "zio"         % zioVersion,
 )
