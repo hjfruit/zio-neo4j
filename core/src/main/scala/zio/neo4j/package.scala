@@ -1,10 +1,14 @@
 package zio.neo4j
 
+import java.util.Collections
+
+import scala.jdk.CollectionConverters.*
+
 import zio.{ neo4j, Task, ZIO }
 import zio.Exit.*
 import zio.neo4j.impl.Neo4jResultCursorLive
 
-import org.neo4j.driver.{ SessionConfig, TransactionConfig }
+import org.neo4j.driver.{ Query, SessionConfig, TransactionConfig }
 import org.neo4j.driver.async.ResultCursor
 
 /**
@@ -15,6 +19,13 @@ import org.neo4j.driver.async.ResultCursor
 extension (resultCursor: ResultCursor) def wrapped = new Neo4jResultCursorLive(resultCursor)
 
 extension (neo4jDriver: Neo4jDriver)
+
+  def withLocalTx[A](
+    query: Query,
+    sessionConfig: SessionConfig = SessionConfig.defaultConfig(),
+    config: TransactionConfig = TransactionConfig.empty()
+  )(action: Neo4jResultCursor => Task[A]): Task[A] =
+    withLocalTx(query.text(), query.parameters().asMap().asScala.toMap, sessionConfig, config)(action)
 
   def withLocalTx[A](
     query: String,
