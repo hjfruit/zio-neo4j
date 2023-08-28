@@ -26,15 +26,14 @@ addCommandAlias("check", "all scalafmtSbtCheck scalafmtCheck test:scalafmtCheck"
 lazy val core = project
   .in(file("core"))
   .settings(
-    name               := "zio-neo4j",
+    name           := "zio-neo4j",
     libraryDependencies ++= Seq(
       "dev.zio"         %% "zio"               % zioVersion % Provided,
       "dev.zio"         %% "zio-test"          % zioVersion % Test,
       "org.neo4j"        % "neo4j-cypher-dsl"  % "2023.6.0",
       "org.neo4j.driver" % "neo4j-java-driver" % "4.4.12"
     ),
-    crossScalaVersions := Seq(scala3Version, scala2Version),
-    testFrameworks     := Seq(new TestFramework("zio.test.sbt.ZTestFramework"))
+    testFrameworks := Seq(new TestFramework("zio.test.sbt.ZTestFramework"))
   )
 
 lazy val examples = project
