@@ -15,13 +15,26 @@ import org.neo4j.driver.async.*
  */
 trait Neo4jSession:
 
+  /**
+   * Begin a new unmanaged transaction with the specified configuration.
+   */
   def beginTransaction(config: TransactionConfig = TransactionConfig.empty()): Task[Neo4jTransaction]
 
+  /**
+   * Execute given unit of asynchronous work in a read asynchronous transaction with the specified configuration.
+   * Transaction will automatically be committed unless given unit of work fails or async transaction commit fails. It
+   * will also not be committed if explicitly rolled back via AsyncTransaction.rollbackAsync().
+   */
   def readTransaction[T <: ResultCursor](
     work: AsyncTransactionWork[CompletionStage[T]],
     config: TransactionConfig = TransactionConfig.empty()
   ): Task[T]
 
+  /**
+   * Execute given unit of asynchronous work in a read asynchronous transaction with the specified configuration.
+   * Transaction will automatically be committed unless given unit of work fails or async transaction commit fails. It
+   * will also not be committed if explicitly rolled back via AsyncTransaction.rollbackAsync().
+   */
   def writeTransaction[T <: ResultCursor](
     work: AsyncTransactionWork[CompletionStage[T]],
     config: TransactionConfig = TransactionConfig.empty()

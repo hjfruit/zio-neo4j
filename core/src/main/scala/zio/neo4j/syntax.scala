@@ -1,14 +1,13 @@
-package zio.neo4j
-
-import java.util.Collections
+package zio.neo4j.syntax
 
 import scala.jdk.CollectionConverters.*
 
 import zio.{ neo4j, Task, ZIO }
 import zio.Exit.*
+import zio.neo4j.{ Neo4jDriver, Neo4jResultCursor }
 import zio.neo4j.impl.Neo4jResultCursorLive
 
-import org.neo4j.driver.{ Query, SessionConfig, TransactionConfig }
+import org.neo4j.driver.*
 import org.neo4j.driver.async.ResultCursor
 
 /**
@@ -20,14 +19,14 @@ extension (resultCursor: ResultCursor) def wrapped = new Neo4jResultCursorLive(r
 
 extension (neo4jDriver: Neo4jDriver)
 
-  def withLocalTx[A](
+  def withTx[A](
     query: Query,
     sessionConfig: SessionConfig,
     config: TransactionConfig
   )(action: Neo4jResultCursor => Task[A]): Task[A] =
-    withLocalTx(query.text(), query.parameters().asMap().asScala.toMap, sessionConfig, config)(action)
+    withTxSimple(query.text(), query.parameters().asMap().asScala.toMap, sessionConfig, config)(action)
 
-  def withLocalTx[A](
+  def withTxSimple[A](
     query: String,
     parameters: Map[String, Any] = Map.empty,
     sessionConfig: SessionConfig = SessionConfig.defaultConfig(),
@@ -35,13 +34,16 @@ extension (neo4jDriver: Neo4jDriver)
   )(action: Neo4jResultCursor => Task[A]): Task[A] =
     ZIO.blocking {
       neo4jDriver.session(sessionConfig).flatMap { neo4jSession =>
-        neo4jSession.beginTransaction(config).flatMap { tx =>
-          neo4jSession.run(query, parameters, config).flatMap(action.apply).onExit {
-            case Failure(e) =>
-              ZIO.logErrorCause(e) *> tx.rollback.onError(cause => ZIO.logErrorCause(cause)).ignoreLogged
-            case Success(_) =>
-              tx.commit.ignoreLogged
+        neo4jSession
+          .beginTransaction(config)
+          .flatMap { tx =>
+            tx.run(query, parameters).flatMap(action.apply).onExit {
+              case Failure(e) =>
+                ZIO.logErrorCause(e) *> tx.rollback.onError(cause => ZIO.logErrorCause(cause)).ignoreLogged
+              case Success(_) =>
+                tx.commit.ignoreLogged
+            }
           }
-        }
+          .ensuring(neo4jSession.close.ignoreLogged)
       }
     }

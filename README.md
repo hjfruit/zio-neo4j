@@ -1,4 +1,4 @@
-ZIO Pulsar
+ZIO Neo4j
 ---
 
 ![CI][Badge-CI] [![Nexus (Snapshots)][Badge-Snapshots]][Link-Snapshots] [![Sonatype Nexus (Releases)][Badge-Release]][Link-Release]
@@ -37,29 +37,34 @@ Manually commit transactions:
 ```scala
 import zio.ZIO
 import zio.neo4j.*
+import zio.neo4j.syntax.*
 
 import org.neo4j.driver.*
 
 final class Neo4jServiceExample1(neo4jDriver: Neo4jDriver) {
 
   def list(query: String): ZIO[Any, Throwable, List[Record]] =
-    neo4jDriver.withLocalTx(query) { cursor =>
+    neo4jDriver.withTxSimple(query) { cursor =>
       cursor.list
     }
 
   def list(query: Query): ZIO[Any, Throwable, List[Record]] =
-    neo4jDriver.withLocalTx(query, SessionConfig.defaultConfig(), TransactionConfig.empty()) { cursor =>
+    neo4jDriver.withTx(query, SessionConfig.defaultConfig(), TransactionConfig.empty()) { cursor =>
       cursor.list
     }
 }
+
 ```
 
 ## Example2
 
 Automatically commit transactions:
 ```scala
+import scala.jdk.CollectionConverters.*
+
 import zio.ZIO
 import zio.neo4j.*
+import zio.neo4j.syntax.*
 
 import org.neo4j.driver.Record
 import org.neo4j.driver.async.ResultCursor
@@ -74,4 +79,5 @@ final class Neo4jServiceExample2(neo4jDriver: Neo4jDriver) {
         .flatMap(_.list)
     }
 }
+
 ```

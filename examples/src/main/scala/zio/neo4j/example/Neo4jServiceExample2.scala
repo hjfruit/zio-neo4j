@@ -4,6 +4,7 @@ import scala.jdk.CollectionConverters.*
 
 import zio.ZIO
 import zio.neo4j.*
+import zio.neo4j.syntax.*
 
 import org.neo4j.driver.Record
 import org.neo4j.driver.async.ResultCursor

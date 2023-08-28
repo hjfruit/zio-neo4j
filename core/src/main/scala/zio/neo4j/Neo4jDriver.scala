@@ -4,11 +4,10 @@ import java.io.IOException
 import java.net.URI
 import java.util.concurrent.TimeUnit
 
-import zio.{ Scope, Task, ULayer, URIO, URLayer, ZIO, ZLayer }
+import zio.{ Scope, Task, ULayer, URLayer, ZIO, ZLayer }
 import zio.neo4j.impl.*
 
 import org.neo4j.driver.*
-import org.neo4j.driver.async.AsyncSession
 
 /**
  * @author

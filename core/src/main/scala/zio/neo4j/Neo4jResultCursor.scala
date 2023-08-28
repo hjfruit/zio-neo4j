@@ -2,8 +2,6 @@ package zio.neo4j
 
 import java.util.function.Consumer
 
-import scala.jdk.CollectionConverters.*
-
 import zio.Task
 
 import org.neo4j.driver.*

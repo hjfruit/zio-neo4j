@@ -28,10 +28,12 @@ lazy val core = project
   .settings(
     name           := "zio-neo4j",
     libraryDependencies ++= Seq(
-      "dev.zio"         %% "zio"               % zioVersion % Provided,
-      "dev.zio"         %% "zio-test"          % zioVersion % Test,
-      "org.neo4j"        % "neo4j-cypher-dsl"  % "2023.6.0",
-      "org.neo4j.driver" % "neo4j-java-driver" % "4.4.12"
+      "org.neo4j.driver" % "neo4j-java-driver"          % "4.4.12",
+      "dev.zio"         %% "zio"                        % zioVersion % Provided,
+      "dev.zio"         %% "zio-test"                   % zioVersion % Test,
+      "com.dimafeng"    %% "testcontainers-scala-neo4j" % "0.40.17"  % Test,
+      "org.neo4j"        % "neo4j-cypher-dsl"           % "2023.6.0" % Test,
+      "ch.qos.logback"   % "logback-classic"            % "1.4.5"    % Test
     ),
     testFrameworks := Seq(new TestFramework("zio.test.sbt.ZTestFramework"))
   )
@@ -41,9 +43,8 @@ lazy val examples = project
   .settings(
     publish / skip := true,
     libraryDependencies ++= Seq(
-      "dev.zio"  %% "zio"              % zioVersion % Provided,
-      "dev.zio"  %% "zio-test"         % zioVersion % Test,
-      "org.neo4j" % "neo4j-cypher-dsl" % "2023.6.0"
+      "dev.zio" %% "zio"      % zioVersion,
+      "dev.zio" %% "zio-test" % zioVersion % Test
     )
   )
   .dependsOn(core)
