@@ -1,6 +1,5 @@
-val zioVersion    = "2.0.13"
-val scala3Version = "3.3.0"
-val scala2Version = "2.13.10"
+val zioVersion    = "2.0.15"
+val scala3Version = "3.3.1-RC4"
 
 inThisBuild(
   List(
@@ -52,7 +51,8 @@ lazy val examples = project
 lazy val `zio-neo4j` = project
   .in(file("."))
   .settings(
-    publish / skip := true
+    publish / skip := true,
+    testFrameworks := Seq(new TestFramework("zio.test.sbt.ZTestFramework"))
   )
   .aggregate(
     core,
