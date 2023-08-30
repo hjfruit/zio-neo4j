@@ -1,9 +1,5 @@
 package zio.neo4j
 
-import java.util.Collections
-
-import scala.jdk.CollectionConverters.*
-
 import zio.ZIO
 import zio.neo4j.*
 import zio.neo4j.syntax.*
