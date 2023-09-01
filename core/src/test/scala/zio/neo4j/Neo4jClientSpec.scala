@@ -2,6 +2,7 @@ package zio.neo4j
 
 import zio.ZIO
 import zio.neo4j.*
+import zio.neo4j.QueryParameter.*
 import zio.neo4j.syntax.*
 import zio.test.*
 
@@ -18,7 +19,12 @@ object Neo4jClientSpec extends Neo4jContainerSpec {
         test("create and read query") {
           for {
             driver <- ZIO.service[Neo4jDriver]
-            single <- driver.withTxSimple("CREATE (a:Person {name: $name})", Map("name" -> "a")) { rs =>
+            single <- driver.withTx(
+                        QueryMapParameter(
+                          "CREATE (a:Person {name: $name})",
+                          Map("name" -> "a")
+                        )
+                      ) { rs =>
                         rs.consume.map(_.counters().nodesCreated())
                       }
             keys   <- driver.session

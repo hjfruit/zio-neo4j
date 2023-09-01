@@ -2,9 +2,9 @@ package zio.neo4j.syntax
 
 import scala.jdk.CollectionConverters.*
 
-import zio.{ neo4j, Task, ZIO }
+import zio.*
 import zio.Exit.*
-import zio.neo4j.{ Neo4jDriver, Neo4jResultCursor }
+import zio.neo4j.{ Neo4jDriver, Neo4jResultCursor, QueryParameter }
 import zio.neo4j.impl.Neo4jResultCursorLive
 
 import org.neo4j.driver.*
@@ -20,15 +20,7 @@ extension (resultCursor: ResultCursor) def wrapped = new Neo4jResultCursorLive(r
 extension (neo4jDriver: Neo4jDriver)
 
   def withTx[A](
-    query: Query,
-    sessionConfig: SessionConfig,
-    config: TransactionConfig
-  )(action: Neo4jResultCursor => Task[A]): Task[A] =
-    withTxSimple(query.text(), query.parameters().asMap().asScala.toMap, sessionConfig, config)(action)
-
-  def withTxSimple[A](
-    query: String,
-    parameters: Map[String, Any] = Map.empty,
+    query: QueryParameter,
     sessionConfig: SessionConfig = SessionConfig.defaultConfig(),
     config: TransactionConfig = TransactionConfig.empty()
   )(action: Neo4jResultCursor => Task[A]): Task[A] =
@@ -37,7 +29,7 @@ extension (neo4jDriver: Neo4jDriver)
         neo4jSession
           .beginTransaction(config)
           .flatMap { tx =>
-            tx.run(query, parameters).flatMap(action.apply).onExit {
+            tx.run(query).flatMap(action.apply).onExit {
               case Failure(e) =>
                 ZIO.logErrorCause(e) *> tx.rollback.onError(cause => ZIO.logErrorCause(cause)).ignoreLogged
               case Success(_) =>

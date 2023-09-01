@@ -1,8 +1,9 @@
 package zio.neo4j
 
 import zio.*
+import zio.neo4j.QueryParameter
 
-import org.neo4j.driver.*
+import org.neo4j.driver.{ Query as _, * }
 
 /**
  * @author
@@ -17,14 +18,6 @@ trait Neo4jTransaction:
 
   def close: Task[Unit]
 
-  def run(query: String, parameters: Value): Task[Neo4jResultCursor]
-
-  def run(query: String, parameters: Map[String, Any]): Task[Neo4jResultCursor]
-
-  def run(query: String, parameters: Record): Task[Neo4jResultCursor]
-
-  def run(query: String): Task[Neo4jResultCursor]
-
-  def run(query: Query): Task[Neo4jResultCursor]
+  def run(query: QueryParameter): Task[Neo4jResultCursor]
 
 end Neo4jTransaction

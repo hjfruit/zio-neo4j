@@ -4,7 +4,7 @@ import java.io.IOException
 import java.net.URI
 import java.util.concurrent.TimeUnit
 
-import zio.{ Scope, Task, ULayer, URLayer, ZIO, ZLayer }
+import zio.{ Config as _, * }
 import zio.neo4j.impl.*
 
 import org.neo4j.driver.*
@@ -36,7 +36,7 @@ end Neo4jDriver
 
 object Neo4jDriver:
 
-  lazy val defaultConfig: ULayer[Config] = ZLayer.succeed(
+  lazy val defaultConfigLayer: ULayer[Config] = ZLayer.succeed(
     Config
       .builder()
       .withEncryption
@@ -51,11 +51,11 @@ object Neo4jDriver:
     for
       authConf <- ZIO.service[Neo4jAuthConfig]
       conf     <- ZIO.service[Config]
-      driver   <- create(authConf, conf)
+      driver   <- make(authConf, conf)
     yield driver
   }.orDie
 
-  def create(authConfig: Neo4jAuthConfig, config: Config): ZIO[Any & Scope, IOException, Neo4jDriver] =
+  def make(authConfig: Neo4jAuthConfig, config: Config): ZIO[Any & Scope, IOException, Neo4jDriver] =
     ZIO.acquireRelease(
       ZIO.attemptBlockingIO(
         Neo4jDriverLive(

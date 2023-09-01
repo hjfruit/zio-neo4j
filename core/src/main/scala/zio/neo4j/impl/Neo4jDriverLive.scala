@@ -2,7 +2,7 @@ package zio
 package neo4j
 package impl
 
-import zio.{ Task, ZIO }
+import zio.*
 
 import org.neo4j.driver.*
 

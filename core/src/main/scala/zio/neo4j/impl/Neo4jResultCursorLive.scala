@@ -6,7 +6,7 @@ import java.util.function.Consumer
 
 import scala.jdk.CollectionConverters.*
 
-import zio.{ Task, ZIO }
+import zio.*
 
 import org.neo4j.driver.*
 import org.neo4j.driver.async.ResultCursor

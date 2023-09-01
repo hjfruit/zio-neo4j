@@ -18,7 +18,7 @@ trait Neo4jContainerSpec extends ZIOSpecDefault {
         TestContainer.neo4j
           .flatMap(a =>
             ZLayer.fromZIO(
-              Neo4jDriver.create(
+              Neo4jDriver.make(
                 Neo4jAuthConfig(a.get.boltUrl, a.get.username, a.get.password),
                 Config.defaultConfig()
               )
