@@ -45,14 +45,8 @@ trait Neo4jSession:
   ): Task[T]
 
   def run(
-    query: String,
-    parameters: Map[String, Any] = Map.empty,
+    query: QueryParameter,
     config: TransactionConfig = TransactionConfig.empty()
-  ): Task[Neo4jResultCursor]
-
-  def run(
-    query: Query,
-    config: TransactionConfig
   ): Task[Neo4jResultCursor]
 
   def lastBookmark: Task[Bookmark]

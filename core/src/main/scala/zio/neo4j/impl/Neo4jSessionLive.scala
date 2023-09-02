@@ -30,17 +30,21 @@ private[neo4j] final class Neo4jSessionLive(underlying: AsyncSession) extends Ne
     ZIO.blocking(ZIO.fromCompletionStage(underlying.writeTransactionAsync(work, config)))
 
   def run(
-    query: String,
-    parameters: Map[String, Any] = Map.empty,
+    query: QueryParameter,
     config: TransactionConfig = TransactionConfig.empty()
-  ): Task[Neo4jResultCursor] =
-    ZIO.fromCompletionStage(underlying.runAsync(query, parameters.asJava, config)).map(new Neo4jResultCursorLive(_))
-
-  def run(
-    query: Query,
-    config: TransactionConfig
-  ): Task[Neo4jResultCursor] =
-    ZIO.fromCompletionStage(underlying.runAsync(query, config)).map(new Neo4jResultCursorLive(_))
+  ): Task[Neo4jResultCursor] = ZIO.fromCompletionStage {
+    query match
+      case QueryParameter.QueryValueParameter(query, parameters)  =>
+        underlying.runAsync(query, parameters)
+      case QueryParameter.QueryMapParameter(query, parameters)    =>
+        underlying.runAsync(query, parameters.asJava, config)
+      case QueryParameter.QueryNoParameter(query)                 =>
+        underlying.runAsync(query, config)
+      case QueryParameter.QueryStringNoParameter(query)           =>
+        underlying.runAsync(query, config)
+      case QueryParameter.QueryRecordParameter(query, parameters) =>
+        underlying.runAsync(query, parameters)
+  }.map(new Neo4jResultCursorLive(_))
 
   def lastBookmark: Task[Bookmark] =
     ZIO.attempt(underlying.lastBookmark())
