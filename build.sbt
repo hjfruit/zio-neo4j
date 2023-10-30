@@ -4,7 +4,7 @@ val scala3Version = "3.3.1-RC4"
 inThisBuild(
   List(
     scalaVersion     := scala3Version,
-    homepage         := Some(url("https://github.com/hjfruit/zio-neo4j")),
+    homepage         := Some(url("https://github.com/jxnu-liguobin/zio-neo4j")),
     licenses         := List("Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0")),
     organization     := "io.github.jxnu-liguobin",
     organizationName := "梦境迷离",
